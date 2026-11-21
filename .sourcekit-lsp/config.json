@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "backgroundIndexing": true,
+  "backgroundPreparationMode": "enabled",
+  "cancelTextDocumentRequestsOnEditAndClose": true,
+  "defaultWorkspaceType": "swiftPM",
+  "experimentalFeatures": [
+    "on-type-formatting"
+  ],
+  "swiftPM": {
+    "configuration": "debug"
+  }
+}

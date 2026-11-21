@@ -1,0 +1,43 @@
+name: update LOC
+on:
+  push: { branches: [ main ] }
+
+jobs:
+  loc_post:
+    runs-on: ubuntu-latest
+    name: Post LOC
+    steps:
+      - name: Checkout out package
+        uses: actions/checkout@v7
+
+      - name: Install tokei
+        uses: giantswarm/install-binary-action@v4.1.0
+        with:
+          binary: "tokei"
+          version: "12.1.2"
+          download_url: "https://github.com/XAMPPRocky/tokei/releases/download/v12.1.2/tokei-x86_64-unknown-linux-gnu.tar.gz"
+          tarball_binary_path: "tokei"
+          smoke_test: "${binary} --version"
+
+      - name: Calculate LOC
+        id: loc
+        run: echo "count=$(tokei -t swift -o json | jq .Swift.code)" >> $GITHUB_OUTPUT
+
+      - name: Print the output
+        run: echo "Line count is ${{ steps.loc.outputs.count }}"
+
+      - name: "Post"
+        if: env.GH_LOC_SECRET != ''
+        env:
+          LOC: ${{ steps.loc.outputs.count }}
+          GH_LOC_SECRET: ${{ secrets.GH_LOC_SECRET }}
+        run: |
+          curl \
+            --fail-with-body \
+            --silent \
+            --show-error \
+            --max-time 5 \
+            --url-query "loc=${LOC}" \
+            --url-query "secret=${GH_LOC_SECRET}" \
+            --data '' \
+            https://rapi.mahdibm.com/v1/loc/DiscordBMVoice
